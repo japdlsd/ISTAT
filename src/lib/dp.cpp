@@ -13,20 +13,6 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
         int* I2_l, unsigned int* I2_end, int n, int m, unsigned int g,
         int mode=0)
 {   
-    // explain this to me
-    cout << "I1_l: (1-based, range 1 to n)!!" << endl;
-    for (int i = 1; i <= n; i++) {
-        cout << I1_l[i] << " ";
-    }
-    cout << endl;
-    cout << "I2_start:" << endl;
-    for (int i = 0; i < m; i++) {
-        cout << I2_start[i] << " ";
-    }
-    cout << endl;
-
-
-
     if (I2_end[m]>g)
     {
         cout << "Wrong input! Intervals are out of range" << endl;
