@@ -38,12 +38,6 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
        Lsum[i] = Lsum[i-1] + I1_l[i];
     }
 
-    int* Lsum_i = new int [n+1];
-    Lsum_i[1] = I1_l[1] + 1 - 0;
-    for (int i = 2; i <= n; i++) {
-        Lsum_i[i] = Lsum_i[i-1] + I1_l[i] + i - 1;
-    }
-
     for (int h=1; h<=g; h++)
     {
         for (int i=1; i<=n; i++)
@@ -62,7 +56,7 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
                         N = 0;
                     }
                     //if ((i>1)&&(h>=Lsum[i])&&(k-diff>=0)&&(diff>=0))
-                    if ((i>1)&&(h>=Lsum_i[i])&&(k-diff>=0)&&(diff>=0))
+                    if ((i>1)&&(h>=Lsum[i] + i - 1)&&(k-diff>=0)&&(diff>=0))
                     {
                         // N = N1[(h-I1_l[i])%L][i-1][k-diff][f1];
                         N = N1[(h-I1_l[i]-1)%L][i-1][k-diff][min(f3, f1)];
