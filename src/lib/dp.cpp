@@ -3,12 +3,30 @@
 #include <algorithm> //min
 #include "func.h" //logsum, sum, first_geq, ...
 
+double ****initialize_dp_table(int n, int m, int L);
+
+void desctuct_dp_table(int n, int m, int L, double ***const *N1);
+
 using namespace std;
 
 void DP(double* output, int* I1_l, unsigned int* I2_start,
         int* I2_l, unsigned int* I2_end, int n, int m, unsigned int g,
         int mode=0)
 {   
+    // explain this to me
+    cout << "I1_l: (1-based, range 1 to n)!!" << endl;
+    for (int i = 1; i <= n; i++) {
+        cout << I1_l[i] << " ";
+    }
+    cout << endl;
+    cout << "I2_start:" << endl;
+    for (int i = 0; i < m; i++) {
+        cout << I2_start[i] << " ";
+    }
+    cout << endl;
+
+
+
     if (I2_end[m]>g)
     {
         cout << "Wrong input! Intervals are out of range" << endl;
@@ -21,39 +39,32 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
     }
     L++;
     double N = -1;
-    double **** N1 = new double *** [L];
-    for (int hh=0; hh<L; hh++)
-    {
-        N1[hh] = new double ** [n+1];   
-        for (int ii=0; ii<=n; ii++)
-        {
-            N1[hh][ii] = new double * [m+1];
-            for (int kk=0; kk<=m; kk++)
-            {
-                N1[hh][ii][kk] = new double [2];
-                for (int aa=0; aa<=1; aa++)
-                {
-                    N1[hh][ii][kk][aa] = -1;
-                }
-            }
-        }
-    }
+    double ****N1 = initialize_dp_table(n, m, L);
     int cval = 0;
     int diff = 0;
     int f1 = 0;
     int f2 = 0;
+    int f3 = 0;
     int* Lsum = new int [n+1];
     Lsum[1] = I1_l[1];
     for (int i=2; i<=n; i++)
     {
-       Lsum[i] = Lsum[i-1] + I1_l[i]; 
+       Lsum[i] = Lsum[i-1] + I1_l[i];
     }
+
+    int* Lsum_i = new int [n+1];
+    Lsum_i[1] = I1_l[1] + 1 - 0;
+    for (int i = 2; i <= n; i++) {
+        Lsum_i[i] = Lsum_i[i-1] + I1_l[i] + i - 1;
+    }
+
     for (int h=1; h<=g; h++)
     {
         for (int i=1; i<=n; i++)
         {
             cval =  c(I1_l[i], h, m, I2_start, I2_end);
             f1 = f(h-I1_l[i], m, I2_start, I2_end);
+            f3 = f(h-I1_l[i]-1, m, I2_start, I2_end);
             f2 = f(h-1, m, I2_start, I2_end);
             for (int k=0; k<=m; k++)
             {
@@ -64,10 +75,11 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
                     {
                         N = 0;
                     }
-                    if ((i>1)&&(h>=Lsum[i])&&(k-diff>=0)&&(diff>=0))
+                    //if ((i>1)&&(h>=Lsum[i])&&(k-diff>=0)&&(diff>=0))
+                    if ((i>1)&&(h>=Lsum_i[i])&&(k-diff>=0)&&(diff>=0))
                     {
-
-                        N = N1[(h-I1_l[i])%L][i-1][k-diff][f1];
+                        // N = N1[(h-I1_l[i])%L][i-1][k-diff][f1];
+                        N = N1[(h-I1_l[i]-1)%L][i-1][k-diff][min(f3, f1)];
                     }
                     if (h==1)
                     {
@@ -119,10 +131,15 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
         }
         delete [] CumSum;
     }
-    
 
-    for (int hh=0; hh<L; hh++)
-    {  
+
+    desctuct_dp_table(n, m, L, N1);
+    delete [] Lsum;
+}
+
+void desctuct_dp_table(int n, int m, int L, double ***const *N1) {
+    for (int hh=0; hh < L; hh++)
+    {
         for (int ii=0; ii<=n; ii++)
         {
             for (int kk=0; kk<=m; kk++)
@@ -134,5 +151,25 @@ void DP(double* output, int* I1_l, unsigned int* I2_start,
         delete [] N1[hh];
     }
     delete [] N1;
-    delete [] Lsum;
+}
+
+double ****initialize_dp_table(int n, int m, int L) {
+    double **** N1 = new double *** [L];
+    for (int hh=0; hh<L; hh++)
+    {
+        N1[hh] = new double ** [n+1];
+        for (int ii=0; ii<=n; ii++)
+        {
+            N1[hh][ii] = new double * [m+1];
+            for (int kk=0; kk<=m; kk++)
+            {
+                N1[hh][ii][kk] = new double [2];
+                for (int aa=0; aa<=1; aa++)
+                {
+                    N1[hh][ii][kk][aa] = -1;
+                }
+            }
+        }
+    }
+    return N1;
 }
